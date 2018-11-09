@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>indexedDB demo</title>
+</head>
+<body>
+  <script>
+    window.onload = function(){
+      var db;
+      var request = indexedDB.open('MyTestDatabase')
+      // 错误处理函数
+      request.onerror = function(e){
+        alert("Why didn't you allow my web app to use IndexedDB?")
+      }
+      // 成功处理函数
+      request.onsuccess = function(e){
+        db = request.result
+      }
+      // 该事件仅在较新的浏览器中被实现
+      request.onupgradeneeded = function(e){
+        // 跟新对象存储空间和索引
+      }
+    }
+  </script>
+</body>
+</html>
