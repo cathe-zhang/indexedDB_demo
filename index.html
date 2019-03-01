@@ -9,20 +9,91 @@
 <body>
   <script>
     window.onload = function(){
+
+      // indexedDB = indexedDB || webkitIndexedDB || mozIndexedDB || null;
+      // if(indexedDB){
+      //     alert('支持');
+      // }else{
+      //     alert('不支持');
+      // }
+
       var db;
       var request = indexedDB.open('MyTestDatabase')
+
+      console.log('request', request)
+      
       // 错误处理函数
       request.onerror = function(e){
-        alert("Why didn't you allow my web app to use IndexedDB?")
+        alert("open database error")
       }
       // 成功处理函数
       request.onsuccess = function(e){
+        console.log('e', e)
+        console.log('e.target', e.target)
         db = request.result
+        console.log('open database success')
+        console.log('db', db)
       }
+
       // 该事件仅在较新的浏览器中被实现
       request.onupgradeneeded = function(e){
         // 跟新对象存储空间和索引
+        console.log(e)
+        console.log('upgrade database success')
+        // console.log()
+
+        db = e.target.result
+
+        // 数据库新建成功以后，新增一张叫做person的表格（对象仓库），主键是id。
+        // 判断是否存在即将新建的表格 不存在则新建
+        if ( !db.objectStoreName.contains('person') ) {
+          // 新建数据仓库（表格）
+          var objectStore = db.createObjectStore('person', {
+            keyPath: 'id'
+          })
+          // 主键（key）是默认建立索引的属性。比如，数据记录是{ id: 1, name: '张三' }，那么id属性可以作为主键。主键也可以指定为下一层对象的属性，比如{ foo: { bar: 'baz' } }的foo.bar也可以指定为主键。
+
+          // 如果数据记录里面没有合适作为主键的属性，那么可以让 IndexedDB 自动生成主键。
+          // var objectStore = db.createObjectStore(
+          //   'person',
+          //   {
+          //     autoIncrement: true,  // 指定主键为一个递增的整数。
+          //   }
+          // )
+
+          // 新建索引
+          objectStore.createIndex(
+            'name',                // 索引名称
+            'name',                // 索引所在属性
+            {                      // 配置对象
+              unique: false        // 说明该属性是否包含重复的值
+            }
+          )
+        }
       }
+
+
+
+      function add() {
+        var request = db.transaction(['person'], 'readwrite')
+          .objectStore('person')
+          .add({ id: 1, name: '张三', age: 24, email: 'zhangsan@example.com' });
+
+        request.onsuccess = function (event) {
+          console.log('数据写入成功');
+        };
+
+        request.onerror = function (event) {
+          console.log('数据写入失败');
+        }
+      }
+
+      add();
+
+
+        
+
+      // }
     }
   </script>
 </body>
